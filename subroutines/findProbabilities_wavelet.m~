@@ -3,8 +3,7 @@ function [probs,likelihoods,noiseP,P,CCs] = ...
                                 segmentParameters,plotsOn,plotData)
 %Find posterior probabilities for wavelet data from likelihood models
 %Inputs:
-%   data -> 1d time series or num_time_points x length(frequencies) array of wavelet data
-%           (wavelets performed in the case of the former, but not the latter)
+%   data -> num_time_points x length(frequencies) array of wavelet data
 %   likelihoodModels -> fitted likelihood models from 
 %                   find_songs_from_hand_annotation.m (default:exampleLikelihoodModels)
 %   noiseModel -> fitted noise likelihood model
@@ -18,7 +17,7 @@ function [probs,likelihoods,noiseP,P,CCs] = ...
 %   noiseP -> probabilities that a particular point belongs to the noise
 %               model
 %   P -> wavelet amplitudes
-%   CCs -> connected components from male and female data (only if plotsOn = true)
+%   CCs -> struct containing statistis from analysis
 %
 % (C) Gordon J. Berman, Jan Clemens, Kelly M. LaRue, and Mala Murthy, 2015
 %     Princeton University

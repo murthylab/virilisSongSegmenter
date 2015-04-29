@@ -1,4 +1,19 @@
-function [maleBoutInfo,femaleBoutInfo,run_data] = segmentVirilisSong(data,likelihoodModels,samplingFrequency)
+function [maleBoutInfo,femaleBoutInfo,run_data] = ...
+                segmentVirilisSong(data,likelihoodModels,samplingFrequency)
+%Fits song data to previously-defined likelihood models
+%Inputs:
+%   data -> 1d array containing a time series of song
+%   likelihoodModels -> fitted likelihood models from 
+%                   find_songs_from_hand_annotation.m (default:exampleLikelihoodModels)
+%   samplingFrequency -> data sampling frequency in Hz (default = 1e4)
+%
+%Outputs:
+%   maleBoutInfo -> struct containing statistis from found male bouts 
+%   femaleBoutInfo -> struct containing statistis from found female bouts 
+%   run_data -> struct containing statistis from analysis
+%
+% (C) Gordon J. Berman, Jan Clemens, Kelly M. LaRue, and Mala Murthy, 2015
+%     Princeton University
 
     addpath('utilities');
     addpath('subroutines');

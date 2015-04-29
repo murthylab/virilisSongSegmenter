@@ -1,10 +1,15 @@
 function segParams = params_virilis(fs)
-%Creates parameters data structure
-%Input:
-%   fs -> Data sampling frequency (default = 10000)
+%Fits song data to previously-defined likelihood models
+%Inputs:
+%   data -> 1d array containing a time series of song
+%   likelihoodModels -> fitted likelihood models from 
+%                   find_songs_from_hand_annotation.m (default:exampleLikelihoodModels)
+%   samplingFrequency -> data sampling frequency in Hz (default = 1e4)
 %
-%Output:
-%   segParams -> struct containing parameters used in model building and fitting
+%Outputs:
+%   maleBoutInfo -> struct containing statistis from found male bouts 
+%   femaleBoutInfo -> struct containing statistis from found female bouts 
+%   run_data -> struct containing statistis from analysis
 %
 % (C) Gordon J. Berman, Jan Clemens, Kelly M. LaRue, and Mala Murthy, 2015
 %     Princeton University
@@ -139,11 +144,9 @@ function segParams = params_virilis(fs)
     
     
     
-    segParams.maxNumGMM = maxNumGMM;
-    segParams.gmm_replicates = gmm_replicates;
+    segParams.maxN
     segParams.fc = fc;
     segParams.fs = fs;
-    segParams.dt = 1/fs;
     segParams.pulsewindow = pulseWindow;
     segParams.noiseFactor = noiseFactor;
     segParams.mpf = mpf;
