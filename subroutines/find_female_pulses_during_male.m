@@ -1,5 +1,6 @@
 function [female_pulses,run_data] = ...
-    find_female_pulses_during_male(male_song_times_final,P,likelihoodModels,female_song_times,amps,segmentParameters)
+    find_female_pulses_during_male(male_song_times_final,P,...
+            likelihoodModels,female_song_times,amps,segmentParameters)
 
 
     if nargin < 5 || isempty(segmentParameters)
@@ -30,13 +31,19 @@ function [female_pulses,run_data] = ...
     likes = cell(size(male_pulses));
     for i=1:L
         likes{i} = zeros(length(male_pulses{i}(:,1)),3);
-        dataScores_male = bsxfun(@minus,male_pulses{i},likelihoodModels.male_mean) * likelihoodModels.coeffs_male(:,1:probModes);
-        dataScores_both = bsxfun(@minus,male_pulses{i},likelihoodModels.both_mean) * likelihoodModels.coeffs_both(:,1:probModes);
-        dataScores_female = bsxfun(@minus,male_pulses{i},likelihoodModels.female_mean) * likelihoodModels.coeffs_female(:,1:probModes);
+        dataScores_male = bsxfun(@minus,male_pulses{i},...
+            likelihoodModels.male_mean) * likelihoodModels.coeffs_male(:,1:probModes);
+        dataScores_both = bsxfun(@minus,male_pulses{i},...
+            likelihoodModels.both_mean) * likelihoodModels.coeffs_both(:,1:probModes);
+        dataScores_female = bsxfun(@minus,male_pulses{i},...
+            likelihoodModels.female_mean) * likelihoodModels.coeffs_female(:,1:probModes);
         for j=1:probModes
-            likes{i}(:,1) = likes{i}(:,1) + log(pdf(likelihoodModels.malePDFs{j},dataScores_male(:,j)));
-            likes{i}(:,2) = likes{i}(:,2) + log(pdf(likelihoodModels.bothPDFs{j},dataScores_both(:,j)));
-            likes{i}(:,3) = likes{i}(:,3) + log(pdf(likelihoodModels.femalePDFs{j},dataScores_female(:,j)));
+            likes{i}(:,1) = likes{i}(:,1) + ...
+                log(pdf(likelihoodModels.malePDFs{j},dataScores_male(:,j)));
+            likes{i}(:,2) = likes{i}(:,2) + ...
+                log(pdf(likelihoodModels.bothPDFs{j},dataScores_both(:,j)));
+            likes{i}(:,3) = likes{i}(:,3) + ...
+                log(pdf(likelihoodModels.femalePDFs{j},dataScores_female(:,j)));
         end
     end
     
@@ -49,7 +56,6 @@ function [female_pulses,run_data] = ...
         maxLikes = max(likes{i},[],2);
         expLikes = exp(bsxfun(@minus,likes{i},maxLikes));
         p_both{i} = sum(expLikes(:,2:3),2) ./ sum(expLikes,2);
-	%p_both{i} = expLikes(:,3) ./ sum(expLikes,2);
     end
     
 
@@ -63,7 +69,8 @@ function [female_pulses,run_data] = ...
         CC = bwconncomp(a >= probThreshold);
         for j=1:length(CC.PixelIdxList)
             if length(CC.PixelIdxList{j}) > minPulseSize && sum(maxVals{i}(CC.PixelIdxList{j})) > 0 
-                female_pulses(count,:) = [CC.PixelIdxList{j}(1) CC.PixelIdxList{j}(end)] + male_song_times_final(i,1) - 1;
+                female_pulses(count,:) = ...
+                    [CC.PixelIdxList{j}(1) CC.PixelIdxList{j}(end)] + male_song_times_final(i,1) - 1;
                 count = count + 1;
             end
         end

@@ -1,15 +1,15 @@
 function [maleBoutInfo,femaleBoutInfo,run_data] = segmentVirilisSong(data,likelihoodModels,samplingFrequency)
 
-    
-    if nargin < 2 || isempty(likelihoodModels)
-        load('likelihoodModels_122013.mat','likelihoodModels');
-    end
+    addpath('utilities');
+    addpath('subroutines');
 
+    if nargin < 2 || isempty(likelihoodModels)
+        load('exampleLikelihoodModels.mat','likelihoodModels');
+    end
     
     if nargin < 3 || isempty(samplingFrequency)
         samplingFrequency = 1e4;
-    end
-    
+    end 
     
     %initialize parameters
     segmentParameters = params_virilis(samplingFrequency);
@@ -25,16 +25,16 @@ function [maleBoutInfo,femaleBoutInfo,run_data] = segmentVirilisSong(data,likeli
     
     
     fprintf('Computing Wavelet Transform\n');
-    Cs = cwt(data,sc,wvlt); %wavelet transformation on signal for that scale and that wavelet
+    Cs = cwt(data,sc,wvlt); 
     fprintf('Computing Power\n');
     P = Cs.*conj(Cs);
     clear Cs
     amps = sum(P)';
     
-    %P = bsxfun(@rdivide,P,amps');
     
     %find noise model for this particular data set
-    [noiseModel,obj,posts,noiseThreshold,idx] = findNoiseModel(P',amps,segmentParameters);
+    [noiseModel,obj,posts,noiseThreshold,idx] = ...
+        findNoiseModel(P',amps,segmentParameters);
     
     maxNoiseLength = 300000;
     if length(idx) > maxNoiseLength
@@ -43,8 +43,9 @@ function [maleBoutInfo,femaleBoutInfo,run_data] = segmentVirilisSong(data,likeli
         noiseData = data(idx);
     end
     
-    %run Mala's pulse detector to find male bouts
-    [pulseInfo,pulseInfoF,pulseInfoM,male_song_times_final] = Process_Song_virilis(data,P,noiseData,segmentParameters);
+    %run pulse detector to find male bouts
+    [pulseInfo,pulseInfoF,pulseInfoM,male_song_times_final] = ...
+        Process_Song_virilis(data,P,noiseData,segmentParameters);
     P = P';
     amps = sum(P,2);
     
@@ -56,31 +57,14 @@ function [maleBoutInfo,femaleBoutInfo,run_data] = segmentVirilisSong(data,likeli
    
 
     %find likelihood model projections
-    %[probs,likelihoods] = findProbabilities_wavelet(P,likelihoodModels,segmentParameters,false);
-    [probs,likelihoods,noiseP] = findProbabilities_wavelet(P,likelihoodModels,noiseModel,segmentParameters,false);
-    
-    %cull Process_Song male bout calls based on probs
-%      initial_male_bouts = false(N,1);
-%     male_song_times_final = male_song_times_final(male_song_times_final(:,1)>0,:);
-%     for i=1:length(male_song_times_final(:,1))
-%       if ~isempty(find(probs(male_song_times_final(i,1):male_song_times_final(i,2)) > 0.01, 1));
-%         initial_male_bouts(male_song_times_final(i,1):male_song_times_final(i,2)) = true;
-%       end
-%     end
-%     
-    %fprintf(1,'Determining Amplitude Thresholds\n');
-    %numPeaks = 2;
-    %numToSample = 20000;
-    %replicates = 3;
-    %ampGMM = gmixPlot(sampleFromMatrix(log(amps)./log(10),numToSample),numPeaks,[],[],true,[],[],[],replicates);
-    %noisePosteriors = posterior(ampGMM,log(amps)./log(10));
-    %[~,minIdx] = min(ampGMM.mu);
-    %noisePosteriors = noisePosteriors(:,minIdx);
-    
+    [probs,likelihoods,noiseP] = ...
+        findProbabilities_wavelet(P,likelihoodModels,noiseModel,segmentParameters,false);
+        
         
     %find all contiguous sections that are not noise
     [~,maxIdx] = max(probs,[],2);
-    isNoise = noiseP > segmentParameters.noiseThreshold | maxIdx == 3 | likelihoods(:,3) > segmentParameters.noiseLikelihoodThreshold;
+    isNoise = noiseP > segmentParameters.noiseThreshold | maxIdx == 3 ...
+        | likelihoods(:,3) > segmentParameters.noiseLikelihoodThreshold;
     isSignal = ~isNoise;
     
     
@@ -98,7 +82,6 @@ function [maleBoutInfo,femaleBoutInfo,run_data] = segmentVirilisSong(data,likeli
     tmp = probs(:,1:3);
     tmp(:,1) = tmp(:,1) + probs(:,4);
     [~,maxIdx] = max(tmp,[],2);
-    %isMale_initial = sum(probs(:,[1 4]),2) > segmentParameters.maleThreshold;
     isMale_initial = maxIdx == 1 & tmp(:,1) > segmentParameters.maleThreshold;
     
     isMale = (isMale_initial | initial_male_bouts) & isSignal;
@@ -145,7 +128,8 @@ function [maleBoutInfo,femaleBoutInfo,run_data] = segmentVirilisSong(data,likeli
     
     %find female pulses during male song regions
     [female_pulses,run_data] = ...
-        find_female_pulses_during_male(male_song_times_final,P,likelihoodModels,female_song_times,amps,segmentParameters);
+        find_female_pulses_during_male(male_song_times_final,P,...
+            likelihoodModels,female_song_times,amps,segmentParameters);
     
     female_pulses = break_up_female_pulses(female_pulses,amps,segmentParameters);
     
@@ -163,23 +147,10 @@ function [maleBoutInfo,femaleBoutInfo,run_data] = segmentVirilisSong(data,likeli
     eliminatePulse = false(numF,1);
     for i=1:numF-numPulses+1
         if min(cull(i:i+numPulses-1)) == 1
-            %eliminatePulse(i+sideLength) = true;
             eliminatePulse(i:(i+2*sideLength)) = true;
         end
     end
     female_pulses = female_pulses(~eliminatePulse,:);
-    
-    %     index_female_pulse_2 = zeros(length(cull)-4,1);
-    %     m=1;
-    %     for n=1:(length(cull)-4)
-    %         if cull(n)>200 && cull(n+1)>200 && cull(n+2)>200;
-    %             index_female_pulse_2(m) = female_pulses(n+1);
-    %             m=m+1;
-    %         end
-    %     end
-    %     %index_female_pulse_3 = index_female_pulse_2(1:(m-1));
-    %     index=ismember(female_pulses,index_female_pulse_2);
-    %     female_pulses_final=female_pulses(index(:,1),:);
     
     
     %eliminate female pulses at the beginning and end of male bouts
@@ -249,7 +220,6 @@ function [maleBoutInfo,femaleBoutInfo,run_data] = segmentVirilisSong(data,likeli
     
     run_data.pulseInfo = pulseInfo;
     run_data.pulseInfoF = pulseInfoF;
-    %run_data.P = P;
     run_data.amps = amps;
     run_data.pulseInfoM = pulseInfoM;
     run_data.segmentParameters = segmentParameters;

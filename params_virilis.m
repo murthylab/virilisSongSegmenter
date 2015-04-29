@@ -11,9 +11,6 @@ end
 %models)
 fc = 100:20:900; 
 
-%sampling frequency  
-%fs = 1e4; 
-
 %factor for computing window around pulse peak 
 %(this determines how much of the signal before and after the peak 
 %is included in the pulse, and sets the parameters w0 and w1.)

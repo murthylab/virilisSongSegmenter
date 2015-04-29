@@ -1,4 +1,6 @@
-function [probs,likelihoods,noiseP,P,CCs] = findProbabilities_wavelet(data,likelihoodModels,noiseModel,segmentParameters,plotsOn,plotData)
+function [probs,likelihoods,noiseP,P,CCs] = ...
+    findProbabilities_wavelet(data,likelihoodModels,noiseModel,...
+                                segmentParameters,plotsOn,plotData)
 
 
     if nargin < 4 || isempty(plotsOn)
@@ -7,11 +9,9 @@ function [probs,likelihoods,noiseP,P,CCs] = findProbabilities_wavelet(data,likel
     
     
     probModes = segmentParameters.probModes;
-    crossLikelihoodPDFs = likelihoodModels.crossLikelihoodPDFs;
 
     smoothParameter_male = segmentParameters.smoothParameter_male;
     smoothParameter_female = segmentParameters.smoothParameter_female;
-    %noise_threshold = .05;
     
     min_male_length = 1;
     min_female_length = 1;
@@ -69,32 +69,7 @@ function [probs,likelihoods,noiseP,P,CCs] = findProbabilities_wavelet(data,likel
         likelihoods(:,4) = likelihoods(:,4) + log(pdf(bothPDFs{i},dataScores_both(:,i)));
         
     end
-    
-    %     tempLikelihoods = zeros(N,probModes);
-    %
-    %     parfor i=1:probModes
-    %         tempLikelihoods(:,i) =
-    %         log(pdf(malePDFs{i},dataScores_male(:,i)));B
-    %     end
-    %     likelihoods(:,1) = sum(tempLikelihoods,2);
-    %
-    %     parfor i=1:probModes
-    %         tempLikelihoods(:,i) = log(pdf(femalePDFs{i},dataScores_female(:,i)));
-    %     end
-    %     likelihoods(:,2) = sum(tempLikelihoods,2);
-    %
-    %     parfor i=1:probModes
-    %         tempLikelihoods(:,i) = log(pdf(noisePDFs{i},dataScores_noise(:,i)));
-    %     end
-    %     likelihoods(:,3) = sum(tempLikelihoods,2);
-    %
-    %     parfor i=1:probModes
-    %         tempLikelihoods(:,i) = log(pdf(bothPDFs{i},dataScores_both(:,i)));
-    %     end
-    %     likelihoods(:,4) = sum(tempLikelihoods,2);
-    %
-    %     clear tempLikelihoods
-    
+
     
     fprintf(1,'Computing Probabilities\n');
     maxVal = max(likelihoods(~isnan(likelihoods) & ~isinf(likelihoods)));
@@ -126,16 +101,10 @@ function [probs,likelihoods,noiseP,P,CCs] = findProbabilities_wavelet(data,likel
     
     probs = bsxfun(@rdivide,bsxfun(@times,subLikes,sumProbs),partition);
     noiseP = probs(:,3);
-    
-    %probs(:,1) = gaussianfilterdata(probs(:,1),smoothParameter_male);
-    %probs(:,2) = gaussianfilterdata(probs(:,2),smoothParameter_female);
-    %probs(:,3) = gaussianfilterdata(probs(:,3),smoothParameter_female);
+
     
     probs = bsxfun(@rdivide,probs,sum(probs,2));
-    
-    if segmentParameters.usePDFProjections
-        probs = CalculateProbs_PDF_Projection(likelihoods,crossLikelihoodPDFs,probs(:,3));
-    end
+
     
     if plotsOn || nargout == 5
         
@@ -147,7 +116,6 @@ function [probs,likelihoods,noiseP,P,CCs] = findProbabilities_wavelet(data,likel
         
         CC_male = largeBWConnComp(maxIdx == 1 | maxIdx == 4,min_male_length);
         CC_female = largeBWConnComp(maxIdx == 2,min_female_length);
-        %CC_both = largeBWConnComp(maxIdx == 4,min_female_length);
         
         CCs = {CC_male,CC_female};
         
@@ -156,21 +124,21 @@ function [probs,likelihoods,noiseP,P,CCs] = findProbabilities_wavelet(data,likel
         subplot(2,1,1)
         hold on
         for i=1:length(CC_male.PixelIdxList)
-            rectangle('Position',[CC_male.PixelIdxList{i}(1) -1 length(CC_male.PixelIdxList{i}) 2],'facecolor','b','edgecolor','b');
+            rectangle('Position',...
+                [CC_male.PixelIdxList{i}(1) -1 length(CC_male.PixelIdxList{i}) 2],...
+                'facecolor','b','edgecolor','b');
         end
+        
         for i=1:length(CC_female.PixelIdxList)
-            rectangle('Position',[CC_female.PixelIdxList{i}(1) -1 length(CC_female.PixelIdxList{i}) 2],'facecolor','r','edgecolor','r');
+            rectangle('Position',...
+                [CC_female.PixelIdxList{i}(1) -1 length(CC_female.PixelIdxList{i}) 2],...
+                'facecolor','r','edgecolor','r');
         end
-        %for i=1:length(CC_both.PixelIdxList)
-        %    rectangle('Position',[CC_both.PixelIdxList{i}(1) -1 length(CC_both.PixelIdxList{i}) 2],'facecolor','g','edgecolor','g');
-        %end
         
         plot(data,'k-')
                 
         ylim([-.3 .3])
         
-        %subplot(3,1,2)
-        %imagesc(1:length(P(:,1)),likelihoodModels.frequencies,P');set(gca,'ydir','normal')
         
         
         subplot(2,1,2)
@@ -178,6 +146,5 @@ function [probs,likelihoods,noiseP,P,CCs] = findProbabilities_wavelet(data,likel
         hold on
         plot(probs(:,2),'rs-');
         plot(probs(:,3),'k^-');
-        %plot(probs(:,4),'gp-');
         ylim([-.02 1.02])
     end

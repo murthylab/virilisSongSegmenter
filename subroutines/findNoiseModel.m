@@ -5,7 +5,6 @@ function [noiseModel,obj,posts,threshold,idx] = findNoiseModel(P,amps,segmentPar
     
     ampsToTest = 50000;
     maxNumGMM = 10000;
-    maxNoiseSize = 300000;
     replicates = 3;
     gmm_replicates = 3;
     
@@ -35,7 +34,7 @@ function [noiseModel,obj,posts,threshold,idx] = findNoiseModel(P,amps,segmentPar
     idx = find(amps < threshold); 
     
     if length(idx) > maxNumNoise
-        qq = randperm(length(idx)); %kelly fix due to bug
+        qq = randperm(length(idx)); 
         q = qq(1:maxNumNoise);
         P = P(idx(q),:);
     else
