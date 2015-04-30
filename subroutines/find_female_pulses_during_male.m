@@ -1,7 +1,20 @@
 function [female_pulses,run_data] = ...
     find_female_pulses_during_male(male_song_times_final,P,...
             likelihoodModels,female_song_times,amps,segmentParameters)
-
+%Finds female pulses within male regions
+%Inputs:
+%   male_song_times_final -> cell array containing many collections of female pulse regions
+%   P -> wavelet values
+%   likelihoodModels -> struct containing likelihood model information
+%   female_song_times -> start and end times of female song
+%   amps -> wavelet amplitudes
+%   segmentParameters -> struct containing run parameters
+%
+%Outputs:
+%   female_pulses -> times of all female pulses
+%
+% (C) Gordon J. Berman, Jan Clemens, Kelly M. LaRue, and Mala Murthy, 2015
+%     Princeton University
 
     if nargin < 5 || isempty(segmentParameters)
         segmentParameters = params_virilis;

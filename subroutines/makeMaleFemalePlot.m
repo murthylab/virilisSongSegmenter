@@ -1,34 +1,13 @@
 function makeMaleFemalePlot(data,malepulseInfo,femalepulseInfo)
-
+%Makes plot of called male/female regions
+%Inputs:
+%   data -> 1d time series
+%   malepulseInfo -> male pulse information returned by segmentVirilisSong
+%   femalepulseInfo -> female pulse information returned by segmentVirilisSong
+%
+% (C) Gordon J. Berman, Jan Clemens, Kelly M. LaRue, and Mala Murthy, 2015
+%     Princeton University
     
-    
-
-% 
-%     hold on
-%     if ~isempty(malepulseInfo.w0)
-%         cc = [0 0 1];
-%         x = malepulseInfo.w0;
-%         y = malepulseInfo.w1;
-%         for i=1:length(x)
-%             rectangle('Position',[x(i) -1 y(i)-x(i)+1 2],'facecolor',cc,'edgecolor',cc);
-%         end
-%     end
-%     
-%     if ~isempty(femalepulseInfo.w0)
-%         cc = [1 0 0];
-%         x = femalepulseInfo.w0;
-%         y = femalepulseInfo.w1;
-%         for i=1:length(x)
-%             rectangle('Position',[x(i) -1 y(i)-x(i)+1 2],'facecolor',cc,'edgecolor',cc);
-%         end
-%     end
-%     
-%     plot(data,'k-')
-%     
-%     ylim([-.3 .3])
-
-
-  
 
     
     N = length(data);

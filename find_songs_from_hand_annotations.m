@@ -23,6 +23,7 @@ function likelihoodModels = find_songs_from_hand_annotations(male_songs,female_s
     frequencies = segParams.fc;
     gmm_replicates = segParams.gmm_replicates;
     maxNumGMM = segParams.maxNumGMM;
+    wav = 'fbsp2-1-2';
     
     fprintf(1,'Finding Male Principal Components\n');
     male_mean = mean(male_songs);

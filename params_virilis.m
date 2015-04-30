@@ -62,7 +62,7 @@ function segParams = params_virilis(fs)
     minFemalePulseSize = 150;
     
     %number of PCA modes to use in analysis (3 -> 41)
-    probModes = 20; %(DONT CHANGE THIS!!!!!!!!!!!!!!)
+    probModes = 20; 
     
     %Pnoise < noiseThreshold to count as signal
     noiseThreshold = .5;

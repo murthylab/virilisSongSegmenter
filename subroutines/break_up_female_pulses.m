@@ -1,4 +1,15 @@
 function female_pulses = break_up_female_pulses(female_pulses,amps,segmentParameters)
+%Finds individual female pulses within female regions
+%Inputs:
+%   female_pulses -> cell array containing many collections of female pulse regions
+%   amps -> wavelet amplitudes
+%   segmentParameters -> struct containing run parameters
+%
+%Outputs:
+%   female_pulses -> broken-up version of the input
+%
+% (C) Gordon J. Berman, Jan Clemens, Kelly M. LaRue, and Mala Murthy, 2015
+%     Princeton University
 
     amps2 = gaussianfilterdata(amps,segmentParameters.smoothParameter_amplitudes);
     amps2(amps == 0) = 0;

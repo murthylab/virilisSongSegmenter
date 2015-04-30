@@ -1,5 +1,19 @@
 function [noiseModel,obj,posts,threshold,idx] = findNoiseModel(P,amps,segmentParameters)
-
+%Generates noise likelihood model from data
+%Inputs:
+%   P -> wavelet transform of data 
+%   amps -> wavelet amplitudes
+%   segmentParameters -> struct containing run parameters
+%
+%Output:
+%   noiseModel -> struct containing noise likelihood model information
+%   obj -> amplitude gaussian mixture model output
+%   posts -> posterior probabilities for noise model based on GMM
+%   threshold -> amplitude threshold for noise calls
+%   idx -> regions chosen to model noise behavior
+%
+% (C) Gordon J. Berman, Jan Clemens, Kelly M. LaRue, and Mala Murthy, 2015
+%     Princeton University
 
     fprintf(1,'Creating Noise Model...\n');
     
