@@ -1,4 +1,9 @@
 function [probs,crossPDFValues] = CalculateProbs_PDF_Projection(likelihoods,crossLikelihoodPDFs,priors)
+%Calculates probabilities using the PDF projection theorem (code is
+%currently unused)
+%
+% (C) Gordon J. Berman, Jan Clemens, Kelly M. LaRue, and Mala Murthy, 2015
+%     Princeton University
 
     N = length(likelihoods(:,1));
     L = length(crossLikelihoodPDFs);
